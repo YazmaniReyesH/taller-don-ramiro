@@ -361,6 +361,16 @@
   }
   .consola .pie-demo { color: rgba(244,245,247,.4); }
 
+  .reiniciar {
+    display: block; margin: 6px auto 0;
+    background: transparent; color: rgba(244, 245, 247, .72);
+    border: 1px solid rgba(255, 255, 255, .18); border-radius: 10px;
+    padding: 10px 16px; min-height: 44px;
+    font-family: "Barlow Condensed", sans-serif; font-weight: 600; font-size: 16px;
+    cursor: pointer; transition: color .12s ease, border-color .12s ease;
+  }
+  .reiniciar:hover { color: #fff; border-color: rgba(255, 176, 32, .6); }
+
   .vacio { text-align: center; padding: 40px 20px; color: #6b7280; }
 
   /* ---------- Consola: recolección, cambio de etapa y aviso ---------- */
@@ -712,6 +722,7 @@
           '<div class="seccion-titulo">Vehículos en el taller</div>' +
           cards +
           '<p class="pie-demo">Demo con datos de ejemplo. Los registros son inmodificables una vez tomada la decisión.</p>' +
+          '<button class="reiniciar" data-accion="reiniciar-demo">↺ Reiniciar demo</button>' +
         '</main>' +
       '</div>';
 
@@ -1074,6 +1085,16 @@
     render();
   }
 
+  function reiniciarDemo() {
+    if (!window.confirm("¿Reiniciar la demo? Se borrarán los cambios de este navegador y volverán los datos de ejemplo.")) return;
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    state = semilla();
+    ui = { confirm: null, enlaceAbierto: null, foto: null, horarioSel: null };
+    guardar();
+    location.hash = "#/consola";
+    render();
+  }
+
   function confirmarRecoleccion(vid) {
     var v = vehiculo(vid);
     if (!v || v.recoleccion || !ui.horarioSel) return;
@@ -1180,6 +1201,9 @@
             break;
           case "confirmar-recoleccion":
             confirmarRecoleccion(vid);
+            break;
+          case "reiniciar-demo":
+            reiniciarDemo();
             break;
           case "decidir":
             decidir(cid, el.getAttribute("data-decision"));
