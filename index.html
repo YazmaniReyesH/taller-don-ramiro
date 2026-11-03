@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taller Don Ramiro — estado y cotizaciones</title>
+<meta name="description" content="Consulta el estado de tu coche y aprueba o rechaza cotizaciones desde un enlace, sin llamar al taller.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Paleta de marca — Taller Don Ramiro */
+    --grafito-900: #15171C;
+    --grafito-800: #1C1F26;
+    --grafito-700: #272b34;
+    --ambar: #FFB020;
+    --ambar-profundo: #E08A00;
+    --papel: #F4F5F7;
+    --blanco: #FFFFFF;
+    --tinta: #1A1D23;
+    --aprobado: #1C9A57;
+    --aprobado-oscuro: #157a44;
+    --rechazado: #CE4040;
+    --rechazado-oscuro: #b33333;
+
+    --radio: 13px;
+    --toque: 58px;
+    --sombra-clara: 0 1px 3px rgba(21, 23, 28, .08), 0 6px 18px rgba(21, 23, 28, .06);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--tinta);
+    background: var(--papel);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1, h2, h3, .cond, .placa, .monto {
+    font-family: "Barlow Condensed", "Barlow", system-ui, sans-serif;
+  }
+
+  /* Foco visible en toda la app */
+  :focus-visible {
+    outline: 3px solid var(--ambar);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  button { font-family: inherit; cursor: pointer; }
+
+  .app { min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- Botones ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--toque);
+    padding: 14px 18px;
+    border: 2px solid transparent;
+    border-radius: var(--radio);
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: .2px;
+    transition: transform .08s ease, filter .12s ease, background-color .12s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+
+  .btn-primario { background: var(--ambar); color: var(--tinta); }
+  .btn-primario:hover { filter: brightness(1.04); }
+
+  .btn-aprobar { background: var(--aprobado); color: #fff; font-size: 23px; min-height: 64px; }
+  .btn-aprobar:hover { background: var(--aprobado-oscuro); }
+
+  .btn-rechazar { background: transparent; color: var(--rechazado-oscuro); border-color: var(--rechazado); }
+  .btn-rechazar:hover { background: rgba(206, 64, 64, .08); }
+
+  .btn-fantasma {
+    background: transparent;
+    color: var(--tinta);
+    border-color: rgba(26, 29, 35, .22);
+    font-size: 18px;
+    min-height: 52px;
+  }
+  .btn-fantasma:hover { background: rgba(26, 29, 35, .05); }
+
+  /* ---------- Consola del mecánico (oscuro) ---------- */
+  .consola { background: var(--grafito-900); color: var(--papel); flex: 1; }
+
+  .hazard {
+    background-image: repeating-linear-gradient(135deg,
+      var(--ambar) 0, var(--ambar) 22px,
+      var(--grafito-900) 22px, var(--grafito-900) 44px);
+    height: 10px;
+  }
+
+  .consola-head {
+    padding: 18px 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+  }
+  .consola-head .marca { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .consola-head h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: var(--blanco);
+  }
+  .consola-head .rol {
+    font-family: "Barlow", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--ambar);
+  }
+  .consola-head p { margin: 6px 0 0; color: rgba(244, 245, 247, .66); font-size: 15px; }
+
+  .contenido { padding: 16px 16px 40px; max-width: 680px; margin: 0 auto; width: 100%; }
+
+  .veh-card {
+    background: var(--grafito-800);
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: var(--radio);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .veh-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .placa {
+    display: inline-block;
+    background: var(--grafito-900);
+    border: 2px solid rgba(255, 255, 255, .22);
+    border-radius: 7px;
+    padding: 3px 10px;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--blanco);
+  }
+  .veh-card .modelo { margin: 10px 0 2px; font-size: 22px; font-weight: 600; color: var(--blanco); font-family: "Barlow Condensed", sans-serif; }
+  .veh-card .duenio { color: rgba(244, 245, 247, .66); font-size: 15px; }
+
+  /* Chips de estado del vehículo */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .chip-recibido { background: rgba(244, 245, 247, .12); color: #cfd3da; }
+  .chip-diagnostico { background: rgba(255, 176, 32, .16); color: var(--ambar); }
+  .chip-reparacion { background: rgba(255, 176, 32, .22); color: var(--ambar); }
+  .chip-listo { background: rgba(28, 154, 87, .18); color: #4fd08a; }
+
+  .seccion-titulo {
+    font-family: "Barlow", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: rgba(244, 245, 247, .5);
+    margin: 18px 2px 10px;
+  }
+
+  /* Cotización dentro de la consola */
+  .cotiz {
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+  .cotiz .desc { font-size: 16px; color: var(--papel); }
+  .cotiz .monto { font-size: 26px; font-weight: 700; color: var(--ambar); margin-top: 4px; }
+  .cotiz-foto { width: 100%; max-height: 180px; object-fit: cover; border-radius: 10px; margin-top: 10px; }
+
+  .estado-cotiz { font-weight: 600; font-size: 14px; margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; }
+  .estado-cotiz.pend { color: var(--ambar); }
+  .estado-cotiz.apr { color: #4fd08a; }
+  .estado-cotiz.rec { color: #f08a8a; }
+
+  .acciones { display: grid; gap: 10px; margin-top: 14px; }
+
+  /* Registro / comprobante (evidencia) */
+  .registro {
+    margin-top: 14px;
+    border: 1px dashed rgba(255, 176, 32, .5);
+    border-radius: 11px;
+    padding: 14px;
+    background: rgba(255, 176, 32, .06);
+  }
+  .registro .folio { font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1px; color: var(--ambar); }
+  .registro dl { margin: 10px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 15px; }
+  .registro dt { color: rgba(244, 245, 247, .55); }
+  .registro dd { margin: 0; color: var(--papel); font-weight: 600; text-align: right; }
+  .registro .candado { font-size: 13px; color: rgba(244, 245, 247, .55); margin-top: 12px; display: flex; align-items: center; gap: 7px; }
+
+  /* Formulario nueva cotización */
+  details.nueva { margin-top: 14px; }
+  details.nueva > summary {
+    list-style: none;
+    display: flex; align-items: center; gap: 8px;
+    min-height: 52px;
+    padding: 12px 14px;
+    border: 2px dashed rgba(255, 176, 32, .45);
+    border-radius: var(--radio);
+    color: var(--ambar);
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+  }
+  details.nueva > summary::-webkit-details-marker { display: none; }
+  .form-campo { margin-top: 12px; }
+  .form-campo label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: rgba(244,245,247,.8); }
+  .form-campo input[type="text"],
+  .form-campo input[type="number"],
+  .form-campo textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: var(--grafito-900);
+    color: var(--papel);
+    font-family: "Barlow", sans-serif;
+    font-size: 17px;
+  }
+  .form-campo textarea { min-height: 76px; resize: vertical; }
+  .form-campo input[type="file"] { color: rgba(244,245,247,.7); font-size: 15px; }
+  .hint { font-size: 13px; color: rgba(244,245,247,.5); margin-top: 6px; }
+
+  .enlace-box {
+    margin-top: 12px;
+    background: var(--grafito-900);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 11px;
+    padding: 12px;
+  }
+  .enlace-box code { display: block; word-break: break-all; font-size: 13px; color: var(--ambar); margin-bottom: 10px; }
+
+  /* ---------- Vista del cliente (claro) ---------- */
+  .cliente { background: var(--papel); color: var(--tinta); flex: 1; }
+  .cliente-head { padding: 16px 18px; background: var(--blanco); border-bottom: 1px solid rgba(26,29,35,.08); }
+  .cliente-head .marca-row { display: flex; justify-content: space-between; align-items: center; }
+  .cliente-head h1 { margin: 0; font-size: 22px; font-weight: 700; color: var(--tinta); }
+  .cliente-head .sub { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+  .c-card {
+    background: var(--blanco);
+    border: 1px solid rgba(26,29,35,.08);
+    border-radius: var(--radio);
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: var(--sombra-clara);
+  }
+  .c-placa {
+    display: inline-block;
+    background: var(--papel);
+    border: 2px solid rgba(26,29,35,.25);
+    border-radius: 7px;
+    padding: 3px 10px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600; font-size: 20px; letter-spacing: 3px; color: var(--tinta);
+  }
+  .c-modelo { font-family: "Barlow Condensed", sans-serif; font-size: 24px; font-weight: 600; margin: 10px 0 2px; }
+  .c-duenio { color: #6b7280; font-size: 15px; }
+
+  .chip-c { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 999px; font-weight: 600; font-size: 14px; margin-top: 12px; }
+  .chip-c::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .chip-c-recibido { background: #eceef2; color: #4b5563; }
+  .chip-c-diagnostico { background: rgba(224,138,0,.14); color: var(--ambar-profundo); }
+  .chip-c-reparacion { background: rgba(224,138,0,.16); color: var(--ambar-profundo); }
+  .chip-c-listo { background: rgba(28,154,87,.14); color: var(--aprobado-oscuro); }
+
+  .c-saludo { font-size: 16px; color: #4b5563; margin: 0 0 14px; }
+
+  .c-cotiz-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; color: #6b7280; margin-bottom: 8px; }
+  .c-desc { font-size: 18px; line-height: 1.4; }
+  .c-monto { font-family: "Barlow Condensed", sans-serif; font-size: 44px; font-weight: 700; color: var(--tinta); margin: 10px 0 2px; line-height: 1; }
+  .c-monto-nota { font-size: 14px; color: #6b7280; }
+  .c-foto { width: 100%; border-radius: 11px; margin-top: 14px; border: 1px solid rgba(26,29,35,.08); }
+
+  .c-acciones { display: grid; gap: 12px; margin-top: 20px; }
+
+  .aviso { font-size: 14px; color: #6b7280; text-align: center; margin-top: 14px; }
+
+  /* Comprobante del cliente */
+  .comprobante { border: 2px solid var(--aprobado); background: #fff; border-radius: var(--radio); padding: 18px; }
+  .comprobante.rechazo { border-color: var(--rechazado); }
+  .comprobante .estampa {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-size: 22px;
+    padding: 8px 14px; border-radius: 10px;
+  }
+  .comprobante .estampa.apr { background: rgba(28,154,87,.12); color: var(--aprobado-oscuro); }
+  .comprobante .estampa.rec { background: rgba(206,64,64,.1); color: var(--rechazado-oscuro); }
+  .comprobante dl { margin: 16px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 9px 14px; font-size: 15px; }
+  .comprobante dt { color: #6b7280; }
+  .comprobante dd { margin: 0; font-weight: 600; text-align: right; }
+  .comprobante .folio-c { font-family: "Barlow Condensed", sans-serif; letter-spacing: 1px; color: var(--ambar-profundo); }
+  .comprobante .candado { font-size: 13px; color: #6b7280; margin-top: 14px; display: flex; align-items: center; gap: 7px; }
+
+  /* ---------- Overlay de confirmación ---------- */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(21,23,28,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0; z-index: 50;
+    animation: aparece .15s ease;
+  }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+  .hoja {
+    background: var(--blanco);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 18px 18px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
+    animation: sube .2s ease;
+  }
+  @keyframes sube { from { transform: translateY(16px); } to { transform: translateY(0); } }
+  .hoja h2 { margin: 0 0 4px; font-size: 24px; }
+  .hoja .conf-monto { font-family: "Barlow Condensed", sans-serif; font-size: 40px; font-weight: 700; margin: 10px 0 2px; line-height: 1; }
+  .hoja .conf-sub { color: #6b7280; font-size: 15px; }
+  .identidad {
+    margin: 18px 0;
+    background: var(--papel);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+  }
+  .identidad strong { font-size: 18px; }
+  .hoja-acciones { display: grid; gap: 10px; }
+  .texto-rechazo { color: var(--rechazado-oscuro); }
+
+  .demo-link { color: var(--ambar-profundo); font-weight: 600; font-size: 14px; text-decoration: none; }
+  .demo-link:hover { text-decoration: underline; }
+  .consola .demo-link { color: var(--ambar); }
+
+  .pie-demo {
+    text-align: center;
+    font-size: 12.5px;
+    color: #9aa0ab;
+    padding: 18px;
+  }
+  .consola .pie-demo { color: rgba(244,245,247,.4); }
+
+  .vacio { text-align: center; padding: 40px 20px; color: #6b7280; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+  <div id="app" class="app"></div>
+
+<script>
+"use strict";
+(function () {
+  var STORE_KEY = "taller-don-ramiro-v1";
+
+  /* ---------------- Persistencia (localStorage con try/catch) ---------------- */
+  function cargar() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function guardar() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    } catch (e) {
+      /* La página debe seguir funcionando aunque no se pueda persistir. */
+    }
+  }
+
+  /* ---------------- Utilidades ---------------- */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  var fmtMoneda = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+  function money(n) { return fmtMoneda.format(Number(n) || 0); }
+  var fmtFecha = new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeStyle: "short" });
+  function fecha(iso) { try { return fmtFecha.format(new Date(iso)); } catch (e) { return iso; } }
+  function id(prefijo) { return prefijo + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function siguienteFolio() {
+    state.folioSeq = (state.folioSeq || 0) + 1;
+    var n = String(state.folioSeq).padStart(4, "0");
+    return "DR-" + new Date().getFullYear() + "-" + n;
+  }
+
+  /* ---------------- Datos de ejemplo ---------------- */
+  function semilla() {
+    var ahora = Date.now();
+    var hace2dias = new Date(ahora - 2 * 24 * 3600 * 1000).toISOString();
+    return {
+      folioSeq: 1,
+      vehiculos: [
+        { id: "v1", placa: "ABC-12-34", modelo: "Nissan Versa 2018", cliente: "María Hernández", estado: "En reparación" },
+        { id: "v2", placa: "XY-456-78", modelo: "Ford Ranger 2015", cliente: "Jorge Palacios", estado: "En diagnóstico" },
+        { id: "v3", placa: "JKT-90-12", modelo: "Volkswagen Jetta 2020", cliente: "Lucía Ramírez", estado: "Recibido" }
+      ],
+      cotizaciones: [
+        // Ya aprobada: deja evidencia y explica por qué el Versa está "En reparación".
+        { id: "c1", vehiculoId: "v1", descripcion: "Cambio de bomba de agua y anticongelante", monto: 1650, foto: null, estado: "aprobada" },
+        // Pendiente principal del demo.
+        { id: "c2", vehiculoId: "v2", descripcion: "Cambio de balatas delanteras y rectificado de discos", monto: 2850, foto: null, estado: "pendiente" },
+        // Segunda pendiente, otro vehículo.
+        { id: "c3", vehiculoId: "v3", descripcion: "Reemplazo de batería y revisión de alternador", monto: 2100, foto: null, estado: "pendiente" }
+      ],
+      registros: [
+        { folio: "DR-" + new Date(hace2dias).getFullYear() + "-0001", cotizacionId: "c1", decision: "aprobada", monto: 1650, nombreCliente: "María Hernández", timestamp: hace2dias }
+      ]
+    };
+  }
+
+  var state = cargar();
+  if (!state || !state.vehiculos) {
+    state = semilla();
+    guardar();
+  }
+
+  /* ---------------- Consultas ---------------- */
+  function vehiculo(vid) { return state.vehiculos.filter(function (v) { return v.id === vid; })[0]; }
+  function cotizacion(cid) { return state.cotizaciones.filter(function (c) { return c.id === cid; })[0]; }
+  function registroDe(cid) { return state.registros.filter(function (r) { return r.cotizacionId === cid; })[0]; }
+  function cotizacionesDe(vid) { return state.cotizaciones.filter(function (c) { return c.vehiculoId === vid; }); }
+
+  function chipVeh(estado, cliente) {
+    var map = {
+      "Recibido": cliente ? "chip-c chip-c-recibido" : "chip chip-recibido",
+      "En diagnóstico": cliente ? "chip-c chip-c-diagnostico" : "chip chip-diagnostico",
+      "En reparación": cliente ? "chip-c chip-c-reparacion" : "chip chip-reparacion",
+      "Listo para entrega": cliente ? "chip-c chip-c-listo" : "chip chip-listo"
+    };
+    return map[estado] || (cliente ? "chip-c chip-c-recibido" : "chip chip-recibido");
+  }
+
+  function enlaceCliente(cid) {
+    return location.origin + location.pathname + "#/c/" + cid;
+  }
+
+  /* ---------------- Estado de UI transitorio ---------------- */
+  var ui = { confirm: null, enlaceAbierto: null, foto: null };
+
+  /* ---------------- Render raíz ---------------- */
+  var app = document.getElementById("app");
+
+  function render() {
+    var hash = location.hash || "#/consola";
+    var mClient = hash.match(/^#\/c\/(.+)$/);
+    if (mClient) {
+      renderCliente(mClient[1]);
+    } else {
+      renderConsola();
+    }
+    if (ui.confirm) renderConfirmacion();
+  }
+
+  /* ---------------- Consola del mecánico ---------------- */
+  function renderConsola() {
+    var cards = state.vehiculos.map(function (v) {
+      var cots = cotizacionesDe(v.id);
+      var cotsHtml = cots.map(function (c) { return bloqueCotizConsola(c); }).join("");
+      return (
+        '<article class="veh-card">' +
+          '<div class="veh-top">' +
+            '<div>' +
+              '<span class="placa">' + esc(v.placa) + '</span>' +
+              '<div class="modelo">' + esc(v.modelo) + '</div>' +
+              '<div class="duenio">' + esc(v.cliente) + '</div>' +
+            '</div>' +
+            '<span class="' + chipVeh(v.estado, false) + '">' + esc(v.estado) + '</span>' +
+          '</div>' +
+          cotsHtml +
+          formNuevaCotiz(v) +
+        '</article>'
+      );
+    }).join("");
+
+    app.className = "app";
+    app.innerHTML =
+      '<div class="consola">' +
+        '<div class="hazard" aria-hidden="true"></div>' +
+        '<header class="consola-head">' +
+          '<div class="marca"><h1>Taller Don Ramiro</h1><span class="rol">Consola del mecánico</span></div>' +
+          '<p>Crea cotizaciones y envíalas al cliente. Aquí queda la evidencia de cada decisión.</p>' +
+        '</header>' +
+        '<main class="contenido">' +
+          '<div class="seccion-titulo">Vehículos en el taller</div>' +
+          cards +
+          '<p class="pie-demo">Demo con datos de ejemplo. Los registros son inmodificables una vez tomada la decisión.</p>' +
+        '</main>' +
+      '</div>';
+
+    bind();
+  }
+
+  function bloqueCotizConsola(c) {
+    var foto = c.foto ? '<img class="cotiz-foto" src="' + esc(c.foto) + '" alt="Foto de la cotización">' : "";
+    var html =
+      '<div class="cotiz">' +
+        '<div class="desc">' + esc(c.descripcion) + '</div>' +
+        '<div class="monto">' + money(c.monto) + '</div>' +
+        foto;
+
+    if (c.estado === "pendiente") {
+      var abierto = ui.enlaceAbierto === c.id;
+      var msg = "Hola, le comparto la cotización de su " + (vehiculo(c.vehiculoId) || {}).modelo +
+                " en Taller Don Ramiro. Puede aprobarla o rechazarla aquí: " + enlaceCliente(c.id);
+      html +=
+        '<div class="estado-cotiz pend">● Pendiente de respuesta del cliente</div>' +
+        '<div class="acciones">' +
+          '<a class="btn btn-primario" target="_blank" rel="noopener" ' +
+             'href="https://wa.me/?text=' + encodeURIComponent(msg) + '">Enviar por WhatsApp</a>' +
+          '<button class="btn btn-fantasma" data-accion="toggle-enlace" data-cid="' + c.id + '">' +
+            (abierto ? "Ocultar enlace" : "Ver enlace del cliente") + '</button>' +
+        '</div>' +
+        (abierto ?
+          '<div class="enlace-box">' +
+            '<code>' + esc(enlaceCliente(c.id)) + '</code>' +
+            '<button class="btn btn-primario" data-accion="abrir-cliente" data-cid="' + c.id + '">Abrir vista del cliente</button>' +
+          '</div>' : "");
+    } else {
+      var r = registroDe(c.id);
+      var apr = c.estado === "aprobada";
+      html += '<div class="estado-cotiz ' + (apr ? "apr" : "rec") + '">' +
+                (apr ? "✓ Aprobada por el cliente" : "✕ Rechazada por el cliente") + '</div>';
+      if (r) html += registroHtmlConsola(r);
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function registroHtmlConsola(r) {
+    return (
+      '<div class="registro">' +
+        '<div class="folio">Folio ' + esc(r.folio) + '</div>' +
+        '<dl>' +
+          '<dt>Decisión</dt><dd>' + (r.decision === "aprobada" ? "Aprobada" : "Rechazada") + '</dd>' +
+          '<dt>Monto</dt><dd>' + money(r.monto) + '</dd>' +
+          '<dt>Cliente</dt><dd>' + esc(r.nombreCliente) + '</dd>' +
+          '<dt>Fecha y hora</dt><dd>' + esc(fecha(r.timestamp)) + '</dd>' +
+        '</dl>' +
+        '<div class="candado">🔒 Registro inmodificable</div>' +
+      '</div>'
+    );
+  }
+
+  function formNuevaCotiz(v) {
+    return (
+      '<details class="nueva">' +
+        '<summary>+ Nueva cotización</summary>' +
+        '<form data-accion="crear-cotiz" data-vid="' + v.id + '">' +
+          '<div class="form-campo">' +
+            '<label for="desc-' + v.id + '">¿Qué hay que reparar?</label>' +
+            '<textarea id="desc-' + v.id + '" name="descripcion" required placeholder="Ej. Cambio de balatas delanteras"></textarea>' +
+          '</div>' +
+          '<div class="form-campo">' +
+            '<label for="monto-' + v.id + '">Costo (MXN)</label>' +
+            '<input id="monto-' + v.id + '" name="monto" type="number" inputmode="numeric" min="1" step="1" required placeholder="0">' +
+          '</div>' +
+          '<div class="form-campo">' +
+            '<label for="foto-' + v.id + '">Foto (opcional)</label>' +
+            '<input id="foto-' + v.id + '" name="foto" type="file" accept="image/*" data-accion="foto">' +
+            '<div class="hint">Toma una foto de la pieza o el daño. Es opcional.</div>' +
+          '</div>' +
+          '<div class="acciones">' +
+            '<button type="submit" class="btn btn-primario">Crear y preparar enlace</button>' +
+          '</div>' +
+        '</form>' +
+      '</details>'
+    );
+  }
+
+  /* ---------------- Vista del cliente ---------------- */
+  function renderCliente(cid) {
+    var c = cotizacion(cid);
+    app.className = "app";
+
+    if (!c) {
+      app.innerHTML =
+        '<div class="cliente">' +
+          cabeceraCliente() +
+          '<main class="contenido">' +
+            '<div class="c-card vacio">Este enlace ya no es válido o la cotización no existe.</div>' +
+            volverConsola() +
+          '</main>' +
+        '</div>';
+      bind();
+      return;
+    }
+
+    var v = vehiculo(c.vehiculoId);
+    var cuerpo;
+
+    if (c.estado === "pendiente") {
+      var foto = c.foto ? '<img class="c-foto" src="' + esc(c.foto) + '" alt="Foto de la cotización">' : "";
+      cuerpo =
+        '<div class="c-card">' +
+          '<div class="c-cotiz-label">Cotización para autorizar</div>' +
+          '<p class="c-desc">' + esc(c.descripcion) + '</p>' +
+          '<div class="c-monto">' + money(c.monto) + '</div>' +
+          '<div class="c-monto-nota">Precio total del trabajo, IVA incluido.</div>' +
+          foto +
+          '<div class="c-acciones">' +
+            '<button class="btn btn-aprobar" data-accion="decidir" data-cid="' + c.id + '" data-decision="aprobada">Aprobar este trabajo</button>' +
+            '<button class="btn btn-rechazar" data-accion="decidir" data-cid="' + c.id + '" data-decision="rechazada">Rechazar este trabajo</button>' +
+          '</div>' +
+          '<p class="aviso">Tu decisión queda registrada con fecha y hora. No necesitas instalar nada.</p>' +
+        '</div>';
+    } else {
+      var r = registroDe(c.id);
+      cuerpo = comprobanteCliente(c, r);
+    }
+
+    app.innerHTML =
+      '<div class="cliente">' +
+        cabeceraCliente() +
+        '<main class="contenido">' +
+          '<div class="c-card">' +
+            '<span class="c-placa">' + esc(v.placa) + '</span>' +
+            '<div class="c-modelo">' + esc(v.modelo) + '</div>' +
+            '<div class="c-duenio">A nombre de ' + esc(v.cliente) + '</div>' +
+            '<span class="' + chipVeh(v.estado, true) + '">' + esc(v.estado) + '</span>' +
+          '</div>' +
+          '<p class="c-saludo">Hola ' + esc(v.cliente.split(" ")[0]) + ', este es el estado de tu coche.</p>' +
+          cuerpo +
+          volverConsola() +
+        '</main>' +
+      '</div>';
+
+    bind();
+  }
+
+  function cabeceraCliente() {
+    return (
+      '<header class="cliente-head">' +
+        '<div class="marca-row">' +
+          '<div><h1>Taller Don Ramiro</h1><div class="sub">Tu enlace privado · sin app, sin contraseña</div></div>' +
+        '</div>' +
+      '</header>'
+    );
+  }
+
+  function comprobanteCliente(c, r) {
+    var apr = c.estado === "aprobada";
+    var detalle = r ?
+      '<dl>' +
+        '<dt>Folio</dt><dd class="folio-c">' + esc(r.folio) + '</dd>' +
+        '<dt>Monto</dt><dd>' + money(r.monto) + '</dd>' +
+        '<dt>A nombre de</dt><dd>' + esc(r.nombreCliente) + '</dd>' +
+        '<dt>Fecha y hora</dt><dd>' + esc(fecha(r.timestamp)) + '</dd>' +
+      '</dl>' : "";
+    var nota = apr
+      ? '<p class="c-saludo" style="margin-top:14px">Listo. El taller ya inició la reparación de tu coche.</p>'
+      : '<p class="c-saludo" style="margin-top:14px">Registramos que no autorizas este trabajo. El taller se pondrá en contacto.</p>';
+    return (
+      '<div class="comprobante ' + (apr ? "" : "rechazo") + '">' +
+        '<span class="estampa ' + (apr ? "apr" : "rec") + '">' +
+          (apr ? "✓ Trabajo aprobado" : "✕ Trabajo rechazado") + '</span>' +
+        '<p class="c-desc" style="margin:14px 0 0">' + esc(c.descripcion) + '</p>' +
+        detalle +
+        '<div class="candado">🔒 Este comprobante no se puede modificar. Guárdalo.</div>' +
+      '</div>' +
+      nota
+    );
+  }
+
+  function volverConsola() {
+    return '<p style="text-align:center;margin-top:20px"><a class="demo-link" href="#/consola">← Volver a la consola (demo)</a></p>';
+  }
+
+  /* ---------------- Overlay de confirmación (identidad + monto) ---------------- */
+  function renderConfirmacion() {
+    var cid = ui.confirm.cid;
+    var decision = ui.confirm.decision;
+    var c = cotizacion(cid);
+    if (!c) { ui.confirm = null; return; }
+    var v = vehiculo(c.vehiculoId);
+    var apr = decision === "aprobada";
+
+    var prev = document.querySelector(".overlay");
+    if (prev) prev.remove();
+
+    var div = document.createElement("div");
+    div.className = "overlay";
+    div.setAttribute("role", "dialog");
+    div.setAttribute("aria-modal", "true");
+    div.setAttribute("aria-labelledby", "conf-titulo");
+    div.innerHTML =
+      '<div class="hoja">' +
+        '<h2 id="conf-titulo">' + (apr ? "Confirma la aprobación" : "Confirma el rechazo") + '</h2>' +
+        '<div class="conf-sub">' + esc(c.descripcion) + '</div>' +
+        '<div class="conf-monto ' + (apr ? "" : "texto-rechazo") + '">' + money(c.monto) + '</div>' +
+        '<div class="conf-sub">Monto exacto del trabajo.</div>' +
+        '<div class="identidad">' +
+          'Para dejar constancia, confirma tu identidad.<br>' +
+          '¿Eres <strong>' + esc(v.cliente) + '</strong>, a nombre de quien está el ' + esc(v.modelo) + '?' +
+        '</div>' +
+        '<div class="hoja-acciones">' +
+          '<button class="btn ' + (apr ? "btn-aprobar" : "btn-rechazar") + '" data-accion="confirmar">' +
+            (apr ? "Sí, soy " + esc(v.cliente) + " y apruebo" : "Sí, soy " + esc(v.cliente) + " y rechazo") + '</button>' +
+          '<button class="btn btn-fantasma" data-accion="cancelar">Cancelar</button>' +
+        '</div>' +
+      '</div>';
+    app.appendChild(div);
+
+    // Cerrar al tocar el fondo o con Escape.
+    div.addEventListener("click", function (e) { if (e.target === div) cerrarConfirm(); });
+    document.addEventListener("keydown", escHandler);
+
+    // Engancha los botones del overlay (se crean después de bind(), por eso aquí).
+    var btnConfirmar = div.querySelector('[data-accion="confirmar"]');
+    var btnCancelar = div.querySelector('[data-accion="cancelar"]');
+    if (btnConfirmar) btnConfirmar.addEventListener("click", confirmar);
+    if (btnCancelar) btnCancelar.addEventListener("click", cerrarConfirm);
+    if (btnConfirmar) btnConfirmar.focus();
+  }
+
+  function escHandler(e) { if (e.key === "Escape") cerrarConfirm(); }
+  function cerrarConfirm() {
+    ui.confirm = null;
+    document.removeEventListener("keydown", escHandler);
+    var o = document.querySelector(".overlay");
+    if (o) o.remove();
+  }
+
+  /* ---------------- Acciones ---------------- */
+  function decidir(cid, decision) {
+    ui.confirm = { cid: cid, decision: decision };
+    renderConfirmacion();
+  }
+
+  function confirmar() {
+    if (!ui.confirm) return;
+    var cid = ui.confirm.cid, decision = ui.confirm.decision;
+    var c = cotizacion(cid);
+    if (!c || c.estado !== "pendiente") { cerrarConfirm(); render(); return; }
+    var v = vehiculo(c.vehiculoId);
+
+    // Genera el registro inmutable.
+    var registro = {
+      folio: siguienteFolio(),
+      cotizacionId: cid,
+      decision: decision,
+      monto: c.monto,
+      nombreCliente: v.cliente,
+      timestamp: new Date().toISOString()
+    };
+    state.registros.push(registro);
+    c.estado = decision;
+    if (decision === "aprobada") {
+      v.estado = "En reparación";
+    }
+    guardar();
+    cerrarConfirm();
+    render();
+  }
+
+  function crearCotiz(form) {
+    var vid = form.getAttribute("data-vid");
+    var descripcion = (form.descripcion.value || "").trim();
+    var monto = Number(form.monto.value);
+    if (!descripcion || !(monto > 0)) return;
+
+    var nueva = {
+      id: id("c"),
+      vehiculoId: vid,
+      descripcion: descripcion,
+      monto: Math.round(monto),
+      foto: ui.foto || null,
+      estado: "pendiente"
+    };
+    state.cotizaciones.push(nueva);
+    ui.foto = null;
+    ui.enlaceAbierto = nueva.id;
+    guardar();
+    render();
+  }
+
+  /* ---------------- Enlaces de eventos ---------------- */
+  function bind() {
+    app.querySelectorAll("[data-accion]").forEach(function (el) {
+      var accion = el.getAttribute("data-accion");
+
+      if (el.tagName === "FORM" && accion === "crear-cotiz") {
+        el.addEventListener("submit", function (e) { e.preventDefault(); crearCotiz(el); });
+        return;
+      }
+      if (accion === "foto") {
+        el.addEventListener("change", function () {
+          var f = el.files && el.files[0];
+          if (!f) { ui.foto = null; return; }
+          var reader = new FileReader();
+          reader.onload = function () { ui.foto = reader.result; };
+          reader.readAsDataURL(f);
+        });
+        return;
+      }
+      if (el.tagName === "A") return; // enlaces nativos (WhatsApp, demo)
+
+      el.addEventListener("click", function () {
+        var cid = el.getAttribute("data-cid");
+        switch (accion) {
+          case "toggle-enlace":
+            ui.enlaceAbierto = (ui.enlaceAbierto === cid) ? null : cid;
+            render();
+            break;
+          case "abrir-cliente":
+            location.hash = "#/c/" + cid;
+            break;
+          case "decidir":
+            decidir(cid, el.getAttribute("data-decision"));
+            break;
+          case "confirmar":
+            confirmar();
+            break;
+          case "cancelar":
+            cerrarConfirm();
+            break;
+        }
+      });
+    });
+  }
+
+  window.addEventListener("hashchange", function () { cerrarConfirm(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>
