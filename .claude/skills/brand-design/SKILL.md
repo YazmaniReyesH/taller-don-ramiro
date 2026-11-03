@@ -44,3 +44,11 @@ explican qué pasó y cómo seguir.
 - Un solo elemento protagonista por pantalla; lo demás, callado.
 - No repetir la franja hazard más de una vez por pantalla.
 - No agregar sombras genéricas ni gradientes decorativos fuera de los definidos.
+
+## Vista del cliente "estado primero" (evolución)
+- Encabezado de estado a todo lo ancho, con color por etapa:
+  en proceso = ámbar (#FFB020 sobre grafito), listo = verde (#1C9A57), espera = ámbar
+  profundo (#E08A00). Titular en Barlow Condensed grande ("Tu Ranger está LISTO").
+- Línea de tiempo de avisos como elemento principal: punto + etapa + fecha/hora.
+- Bloque de "Confirmar recolección" prominente cuando el estado es "Listo para entrega".
+- El objetivo es que el cliente entienda el estado en menos de 2 segundos, sin leer.
