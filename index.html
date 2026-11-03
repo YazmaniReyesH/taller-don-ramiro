@@ -361,11 +361,15 @@
   }
   .consola .pie-demo { color: rgba(244,245,247,.4); }
 
+  .consola-head .head-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
   .reiniciar {
-    display: block; margin: 6px auto 0;
+    flex: none; white-space: nowrap;
     background: transparent; color: rgba(244, 245, 247, .72);
     border: 1px solid rgba(255, 255, 255, .18); border-radius: 10px;
-    padding: 10px 16px; min-height: 44px;
+    padding: 9px 14px; min-height: 44px;
     font-family: "Barlow Condensed", sans-serif; font-weight: 600; font-size: 16px;
     cursor: pointer; transition: color .12s ease, border-color .12s ease;
   }
@@ -715,14 +719,16 @@
       '<div class="consola">' +
         '<div class="hazard" aria-hidden="true"></div>' +
         '<header class="consola-head">' +
-          '<div class="marca"><h1>Taller Don Ramiro</h1><span class="rol">Consola del mecánico</span></div>' +
+          '<div class="head-row">' +
+            '<div class="marca"><h1>Taller Don Ramiro</h1><span class="rol">Consola del mecánico</span></div>' +
+            '<button class="reiniciar" data-accion="reiniciar-demo">↺ Reiniciar demo</button>' +
+          '</div>' +
           '<p>Cambia la etapa para avisar al cliente y envía cotizaciones. Aquí queda la evidencia de cada decisión.</p>' +
         '</header>' +
         '<main class="contenido">' +
           '<div class="seccion-titulo">Vehículos en el taller</div>' +
           cards +
           '<p class="pie-demo">Demo con datos de ejemplo. Los registros son inmodificables una vez tomada la decisión.</p>' +
-          '<button class="reiniciar" data-accion="reiniciar-demo">↺ Reiniciar demo</button>' +
         '</main>' +
       '</div>';
 
