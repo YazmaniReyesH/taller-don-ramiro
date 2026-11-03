@@ -93,6 +93,9 @@
     min-height: 52px;
   }
   .btn-fantasma:hover { background: rgba(26, 29, 35, .05); }
+  /* En la consola (fondo grafito) el botón fantasma necesita texto claro. */
+  .consola .btn-fantasma { color: var(--papel); border-color: rgba(255, 255, 255, .22); }
+  .consola .btn-fantasma:hover { background: rgba(255, 255, 255, .06); }
 
   /* ---------- Consola del mecánico (oscuro) ---------- */
   .consola { background: var(--grafito-900); color: var(--papel); flex: 1; }
@@ -360,6 +363,118 @@
 
   .vacio { text-align: center; padding: 40px 20px; color: #6b7280; }
 
+  /* ---------- Consola: recolección, cambio de etapa y aviso ---------- */
+  .reco-linea { margin-top: 12px; font-size: 14px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .reco-linea.ok { color: #4fd08a; }
+  .reco-linea.pend { color: var(--ambar); }
+  .reco-linea.off { color: rgba(244, 245, 247, .55); }
+
+  details.cambiar { margin-top: 14px; }
+  details.cambiar > summary {
+    list-style: none;
+    display: flex; align-items: center; gap: 8px;
+    min-height: 52px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: var(--radio);
+    color: var(--papel);
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+  }
+  details.cambiar > summary::-webkit-details-marker { display: none; }
+  /* Affordance de botón en los summaries: cursor de mano + hover. */
+  details.cambiar > summary, details.nueva > summary { cursor: pointer; }
+  details.cambiar > summary:hover { border-color: rgba(255, 176, 32, .6); color: #fff; }
+  details.nueva > summary:hover { background: rgba(255, 176, 32, .08); }
+  .etapa-ops { display: grid; gap: 8px; margin-top: 10px; }
+  .etapa-op {
+    width: 100%;
+    min-height: 54px;
+    padding: 10px 14px;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    background: var(--grafito-900);
+    color: var(--papel);
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    text-align: left;
+  }
+  .etapa-op:hover { border-color: rgba(255, 176, 32, .6); }
+  .etapa-op.actual { border-color: var(--ambar); color: var(--ambar); background: rgba(255, 176, 32, .08); cursor: default; }
+  .etapa-op[disabled] { cursor: default; }
+
+  .aviso-consola {
+    margin-top: 14px;
+    border: 1px solid rgba(255, 176, 32, .3);
+    background: rgba(255, 176, 32, .06);
+    border-radius: 11px;
+    padding: 12px;
+  }
+  .aviso-top { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(244, 245, 247, .5); }
+  .aviso-etapa { font-family: "Barlow Condensed", sans-serif; font-weight: 600; font-size: 19px; color: var(--ambar); margin-top: 2px; }
+  .aviso-texto { font-size: 14px; color: rgba(244, 245, 247, .8); margin-top: 4px; }
+  .aviso-fecha { font-size: 13px; color: rgba(244, 245, 247, .55); margin-top: 2px; }
+
+  .chip-espera { background: rgba(224, 138, 0, .22); color: #ffc661; }
+
+  /* ---------- Cliente: encabezado de estado (estado primero) ---------- */
+  .estado-hero { width: 100%; padding: 26px 20px 30px; }
+  .estado-hero .hero-placa { font-family: "Barlow Condensed", sans-serif; letter-spacing: 3px; font-size: 17px; font-weight: 600; }
+  .estado-hero .hero-titular { font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-size: 40px; line-height: 1.03; margin: 8px 0 6px; }
+  .estado-hero .hero-sub { font-size: 15px; }
+  .hero-proceso { background: var(--grafito-900); color: var(--ambar); }
+  .hero-proceso .hero-placa, .hero-proceso .hero-sub { color: rgba(244, 245, 247, .82); }
+  .hero-espera { background: var(--ambar-profundo); color: var(--tinta); }
+  .hero-espera .hero-placa, .hero-espera .hero-sub { color: rgba(26, 29, 35, .8); }
+  .hero-listo { background: var(--aprobado); color: #fff; }
+  .hero-listo .hero-placa, .hero-listo .hero-sub { color: rgba(255, 255, 255, .88); }
+
+  .chip-c-espera { background: rgba(224, 138, 0, .16); color: var(--ambar-profundo); }
+
+  /* ---------- Cliente: línea de tiempo de avisos ---------- */
+  .timeline { list-style: none; margin: 10px 0 0; padding: 0; }
+  .timeline li { position: relative; padding: 0 0 20px 28px; }
+  .timeline li::before {
+    content: ""; position: absolute; left: 6px; top: 20px; bottom: -2px; width: 2px;
+    background: rgba(26, 29, 35, .14);
+  }
+  .timeline li:last-child { padding-bottom: 0; }
+  .timeline li:last-child::before { display: none; }
+  .timeline .punto {
+    position: absolute; left: 0; top: 2px; width: 14px; height: 14px; border-radius: 50%;
+    background: #cfd3da; box-shadow: 0 0 0 3px var(--blanco), 0 0 0 5px rgba(26, 29, 35, .1);
+  }
+  .timeline li.activa .punto { background: var(--ambar-profundo); }
+  .timeline li.activa.es-listo .punto { background: var(--aprobado); }
+  .t-etapa { font-weight: 600; font-size: 17px; color: var(--tinta); }
+  .timeline li.activa .t-etapa { font-weight: 700; }
+  .t-fecha { color: #6b7280; font-size: 14px; }
+
+  /* ---------- Cliente: confirmar recolección ---------- */
+  .recoleccion { border: 2px solid var(--aprobado); border-radius: var(--radio); background: var(--blanco); padding: 18px; margin-bottom: 16px; box-shadow: var(--sombra-clara); }
+  .recoleccion h2 { font-family: "Barlow Condensed", sans-serif; font-size: 26px; margin: 0 0 4px; }
+  .recoleccion p { margin: 0 0 6px; color: #4b5563; font-size: 15px; }
+  .horarios { display: grid; gap: 10px; margin: 14px 0; }
+  .horario-op {
+    width: 100%; min-height: 58px; padding: 12px 16px;
+    border: 2px solid rgba(26, 29, 35, .18); border-radius: var(--radio);
+    background: var(--blanco); color: var(--tinta);
+    font-family: "Barlow Condensed", sans-serif; font-weight: 600; font-size: 20px; text-align: center;
+  }
+  .horario-op.sel { border-color: var(--aprobado); background: rgba(28, 154, 87, .08); }
+  .horario-op .check { color: var(--aprobado); margin-left: 6px; }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  .reco-ok { border: 2px solid var(--aprobado); border-radius: var(--radio); background: rgba(28, 154, 87, .06); padding: 18px; margin-bottom: 16px; }
+  .reco-ok .estampa { display: inline-flex; align-items: center; gap: 8px; font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-size: 22px; color: var(--aprobado-oscuro); }
+  .reco-ok dl { margin: 14px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 15px; }
+  .reco-ok dt { color: #6b7280; }
+  .reco-ok dd { margin: 0; font-weight: 600; text-align: right; }
+
+  .bloque-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; color: #6b7280; margin-bottom: 8px; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
@@ -371,7 +486,22 @@
 <script>
 "use strict";
 (function () {
-  var STORE_KEY = "taller-don-ramiro-v1";
+  var STORE_KEY = "taller-don-ramiro-v2";
+
+  /* Etapas del vehículo, en orden del flujo. */
+  var ETAPAS = ["Recibido", "En diagnóstico", "Esperando aprobación", "En reparación", "Listo para entrega"];
+
+  /* Texto de aviso predefinido por etapa (el mecánico no escribe nada). */
+  var TEXTO_AVISO = {
+    "Recibido": "Recibimos tu coche en el taller. Pronto empezamos la revisión.",
+    "En diagnóstico": "Estamos revisando tu coche para encontrar la falla.",
+    "Esperando aprobación": "Tienes una cotización por autorizar. Ábrela para aprobar o rechazar el trabajo.",
+    "En reparación": "Manos a la obra: tu coche ya está en reparación.",
+    "Listo para entrega": "¡Tu coche está listo! Confirma a qué hora pasas por él."
+  };
+
+  /* Horarios predefinidos para confirmar la recolección. */
+  var HORARIOS = ["Hoy por la tarde", "Mañana por la mañana", "Mañana por la tarde"];
 
   /* ---------------- Persistencia (localStorage con try/catch) ---------------- */
   function cargar() {
@@ -409,25 +539,69 @@
 
   /* ---------------- Datos de ejemplo ---------------- */
   function semilla() {
-    var ahora = Date.now();
-    var hace2dias = new Date(ahora - 2 * 24 * 3600 * 1000).toISOString();
+    var H = 3600 * 1000, D = 24 * H;
+    var t = Date.now();
+    function iso(ms) { return new Date(ms).toISOString(); }
+    var anio = new Date().getFullYear();
+
     return {
-      folioSeq: 1,
+      folioSeq: 3,
       vehiculos: [
-        { id: "v1", placa: "ABC-12-34", modelo: "Nissan Versa 2018", cliente: "María Hernández", estado: "En reparación" },
-        { id: "v2", placa: "XY-456-78", modelo: "Ford Ranger 2015", cliente: "Jorge Palacios", estado: "En diagnóstico" },
-        { id: "v3", placa: "JKT-90-12", modelo: "Volkswagen Jetta 2020", cliente: "Lucía Ramírez", estado: "Recibido" }
+        // 1) Listo para entrega, con línea de tiempo completa y SIN recolección confirmada.
+        {
+          id: "v1", placa: "XY-456-78", modelo: "Ford Ranger 2015", corto: "Ranger",
+          cliente: "Jorge Palacios", estado: "Listo para entrega", recoleccion: null,
+          avisos: [
+            { etapa: "Recibido", timestamp: iso(t - 3 * D) },
+            { etapa: "En diagnóstico", timestamp: iso(t - 3 * D + 3 * H) },
+            { etapa: "En reparación", timestamp: iso(t - 2 * D) },
+            { etapa: "Listo para entrega", timestamp: iso(t - 6 * H) }
+          ]
+        },
+        // 2) Etapa intermedia (En reparación) con un par de avisos.
+        {
+          id: "v2", placa: "ABC-12-34", modelo: "Nissan Versa 2018", corto: "Versa",
+          cliente: "María Hernández", estado: "En reparación", recoleccion: null,
+          avisos: [
+            { etapa: "Recibido", timestamp: iso(t - 1 * D) },
+            { etapa: "En diagnóstico", timestamp: iso(t - 1 * D + 3 * H) },
+            { etapa: "En reparación", timestamp: iso(t - 20 * H) }
+          ]
+        },
+        // 3) Esperando aprobación: tiene una cotización pendiente (feature anterior).
+        {
+          id: "v3", placa: "JKT-90-12", modelo: "Volkswagen Jetta 2020", corto: "Jetta",
+          cliente: "Lucía Ramírez", estado: "Esperando aprobación", recoleccion: null,
+          avisos: [
+            { etapa: "Recibido", timestamp: iso(t - 8 * H) },
+            { etapa: "En diagnóstico", timestamp: iso(t - 5 * H) },
+            { etapa: "Esperando aprobación", timestamp: iso(t - 2 * H) }
+          ]
+        },
+        // 4) Listo para entrega con recolección YA confirmada (muestra ese estado en consola).
+        {
+          id: "v4", placa: "GTO-77-21", modelo: "Chevrolet Aveo 2017", corto: "Aveo",
+          cliente: "Pedro Gómez", estado: "Listo para entrega",
+          recoleccion: { horario: "Mañana por la mañana", timestamp: iso(t - 20 * H) },
+          avisos: [
+            { etapa: "Recibido", timestamp: iso(t - 4 * D) },
+            { etapa: "En diagnóstico", timestamp: iso(t - 4 * D + 2 * H) },
+            { etapa: "En reparación", timestamp: iso(t - 3 * D) },
+            { etapa: "Listo para entrega", timestamp: iso(t - 26 * H) }
+          ]
+        }
       ],
       cotizaciones: [
-        // Ya aprobada: deja evidencia y explica por qué el Versa está "En reparación".
-        { id: "c1", vehiculoId: "v1", descripcion: "Cambio de bomba de agua y anticongelante", monto: 1650, foto: null, estado: "aprobada" },
-        // Pendiente principal del demo.
-        { id: "c2", vehiculoId: "v2", descripcion: "Cambio de balatas delanteras y rectificado de discos", monto: 2850, foto: null, estado: "pendiente" },
-        // Segunda pendiente, otro vehículo.
-        { id: "c3", vehiculoId: "v3", descripcion: "Reemplazo de batería y revisión de alternador", monto: 2100, foto: null, estado: "pendiente" }
+        { id: "c1", vehiculoId: "v1", descripcion: "Cambio de clutch y balero de collarín", monto: 4200, foto: null, estado: "aprobada" },
+        { id: "c2", vehiculoId: "v2", descripcion: "Cambio de bomba de agua y anticongelante", monto: 1650, foto: null, estado: "aprobada" },
+        // Pendiente: mantiene demostrable el feature de aprobación.
+        { id: "c3", vehiculoId: "v3", descripcion: "Cambio de balatas delanteras y rectificado de discos", monto: 2850, foto: null, estado: "pendiente" },
+        { id: "c4", vehiculoId: "v4", descripcion: "Afinación mayor y cambio de bujías", monto: 980, foto: null, estado: "aprobada" }
       ],
       registros: [
-        { folio: "DR-" + new Date(hace2dias).getFullYear() + "-0001", cotizacionId: "c1", decision: "aprobada", monto: 1650, nombreCliente: "María Hernández", timestamp: hace2dias }
+        { folio: "DR-" + anio + "-0001", cotizacionId: "c1", decision: "aprobada", monto: 4200, nombreCliente: "Jorge Palacios", timestamp: iso(t - 2 * D - 1 * H) },
+        { folio: "DR-" + anio + "-0002", cotizacionId: "c2", decision: "aprobada", monto: 1650, nombreCliente: "María Hernández", timestamp: iso(t - 21 * H) },
+        { folio: "DR-" + anio + "-0003", cotizacionId: "c4", decision: "aprobada", monto: 980, nombreCliente: "Pedro Gómez", timestamp: iso(t - 3 * D - 1 * H) }
       ]
     };
   }
@@ -444,31 +618,58 @@
   function registroDe(cid) { return state.registros.filter(function (r) { return r.cotizacionId === cid; })[0]; }
   function cotizacionesDe(vid) { return state.cotizaciones.filter(function (c) { return c.vehiculoId === vid; }); }
 
-  function chipVeh(estado, cliente) {
+  function chipVeh(estado) {
     var map = {
-      "Recibido": cliente ? "chip-c chip-c-recibido" : "chip chip-recibido",
-      "En diagnóstico": cliente ? "chip-c chip-c-diagnostico" : "chip chip-diagnostico",
-      "En reparación": cliente ? "chip-c chip-c-reparacion" : "chip chip-reparacion",
-      "Listo para entrega": cliente ? "chip-c chip-c-listo" : "chip chip-listo"
+      "Recibido": "chip-recibido",
+      "En diagnóstico": "chip-diagnostico",
+      "Esperando aprobación": "chip-espera",
+      "En reparación": "chip-reparacion",
+      "Listo para entrega": "chip-listo"
     };
-    return map[estado] || (cliente ? "chip-c chip-c-recibido" : "chip chip-recibido");
+    return "chip " + (map[estado] || "chip-recibido");
+  }
+
+  /* Clase de color y titular del encabezado "estado primero" del cliente. */
+  function heroDe(v) {
+    var clase, titular;
+    switch (v.estado) {
+      case "Listo para entrega":
+        clase = "hero-listo"; titular = "Tu " + v.corto + " está LISTO"; break;
+      case "Esperando aprobación":
+        clase = "hero-espera"; titular = "Tu " + v.corto + " espera tu visto bueno"; break;
+      case "En diagnóstico":
+        clase = "hero-proceso"; titular = "Tu " + v.corto + " está en diagnóstico"; break;
+      case "En reparación":
+        clase = "hero-proceso"; titular = "Tu " + v.corto + " está en reparación"; break;
+      default:
+        clase = "hero-proceso"; titular = "Tu " + v.corto + " ya está en el taller";
+    }
+    return { clase: clase, titular: titular };
   }
 
   function enlaceCliente(cid) {
     return location.origin + location.pathname + "#/c/" + cid;
   }
+  function enlaceVehiculo(vid) {
+    return location.origin + location.pathname + "#/v/" + vid;
+  }
 
   /* ---------------- Estado de UI transitorio ---------------- */
-  var ui = { confirm: null, enlaceAbierto: null, foto: null };
+  var ui = { confirm: null, enlaceAbierto: null, foto: null, horarioSel: null };
 
   /* ---------------- Render raíz ---------------- */
   var app = document.getElementById("app");
 
   function render() {
     var hash = location.hash || "#/consola";
-    var mClient = hash.match(/^#\/c\/(.+)$/);
-    if (mClient) {
-      renderCliente(mClient[1]);
+    var mVeh = hash.match(/^#\/v\/(.+)$/);
+    var mCot = hash.match(/^#\/c\/(.+)$/);
+    if (mVeh) {
+      renderClienteVehiculo(mVeh[1]);
+    } else if (mCot) {
+      // Compatibilidad: el enlace de cotización abre la vista del vehículo.
+      var c = cotizacion(mCot[1]);
+      renderClienteVehiculo(c ? c.vehiculoId : null);
     } else {
       renderConsola();
     }
@@ -488,8 +689,11 @@
               '<div class="modelo">' + esc(v.modelo) + '</div>' +
               '<div class="duenio">' + esc(v.cliente) + '</div>' +
             '</div>' +
-            '<span class="' + chipVeh(v.estado, false) + '">' + esc(v.estado) + '</span>' +
+            '<span class="' + chipVeh(v.estado) + '">' + esc(v.estado) + '</span>' +
           '</div>' +
+          recoleccionConsola(v) +
+          cambiarEtapaConsola(v) +
+          ultimoAvisoConsola(v) +
           cotsHtml +
           formNuevaCotiz(v) +
         '</article>'
@@ -502,7 +706,7 @@
         '<div class="hazard" aria-hidden="true"></div>' +
         '<header class="consola-head">' +
           '<div class="marca"><h1>Taller Don Ramiro</h1><span class="rol">Consola del mecánico</span></div>' +
-          '<p>Crea cotizaciones y envíalas al cliente. Aquí queda la evidencia de cada decisión.</p>' +
+          '<p>Cambia la etapa para avisar al cliente y envía cotizaciones. Aquí queda la evidencia de cada decisión.</p>' +
         '</header>' +
         '<main class="contenido">' +
           '<div class="seccion-titulo">Vehículos en el taller</div>' +
@@ -512,6 +716,52 @@
       '</div>';
 
     bind();
+  }
+
+  function recoleccionConsola(v) {
+    if (v.recoleccion) {
+      return '<div class="reco-linea ok">🗓️ Recolección confirmada: ' + esc(v.recoleccion.horario) +
+             ' · ' + esc(fecha(v.recoleccion.timestamp)) + '</div>';
+    }
+    var clase = v.estado === "Listo para entrega" ? "pend" : "off";
+    return '<div class="reco-linea ' + clase + '">🗓️ Recolección: sin confirmar</div>';
+  }
+
+  function cambiarEtapaConsola(v) {
+    var ops = ETAPAS.map(function (e) {
+      var actual = v.estado === e;
+      return '<button class="etapa-op' + (actual ? " actual" : "") + '" ' +
+             (actual ? 'disabled aria-current="true"' : 'data-accion="cambiar-etapa" data-vid="' + v.id + '" data-etapa="' + esc(e) + '"') +
+             '>' + esc(e) + (actual ? " ·" : "") + '</button>';
+    }).join("");
+    return (
+      '<details class="cambiar">' +
+        '<summary>Cambiar etapa y avisar</summary>' +
+        '<div class="etapa-ops">' + ops + '</div>' +
+        '<p class="hint">Al cambiar la etapa se genera el aviso del cliente automáticamente.</p>' +
+      '</details>'
+    );
+  }
+
+  function ultimoAvisoConsola(v) {
+    var avisos = v.avisos || [];
+    if (!avisos.length) return "";
+    var last = avisos[avisos.length - 1];
+    var texto = TEXTO_AVISO[last.etapa] || "";
+    var msg = texto + " Sigue el estado de tu " + v.corto + " aquí: " + enlaceVehiculo(v.id);
+    return (
+      '<div class="aviso-consola">' +
+        '<div class="aviso-top">Último aviso · ' + avisos.length + ' en total</div>' +
+        '<div class="aviso-etapa">' + esc(last.etapa) + '</div>' +
+        '<div class="aviso-texto">' + esc(texto) + '</div>' +
+        '<div class="aviso-fecha">' + esc(fecha(last.timestamp)) + '</div>' +
+        '<div class="acciones">' +
+          '<a class="btn btn-primario" target="_blank" rel="noopener" ' +
+             'href="https://wa.me/?text=' + encodeURIComponent(msg) + '">Enviar aviso por WhatsApp</a>' +
+          '<button class="btn btn-fantasma" data-accion="abrir-vehiculo" data-vid="' + v.id + '">Abrir vista del cliente</button>' +
+        '</div>' +
+      '</div>'
+    );
   }
 
   function bloqueCotizConsola(c) {
@@ -537,7 +787,7 @@
         (abierto ?
           '<div class="enlace-box">' +
             '<code>' + esc(enlaceCliente(c.id)) + '</code>' +
-            '<button class="btn btn-primario" data-accion="abrir-cliente" data-cid="' + c.id + '">Abrir vista del cliente</button>' +
+            '<p class="hint" style="margin:8px 0 0">Copia este enlace para compartirlo con el cliente.</p>' +
           '</div>' : "");
     } else {
       var r = registroDe(c.id);
@@ -591,17 +841,17 @@
     );
   }
 
-  /* ---------------- Vista del cliente ---------------- */
-  function renderCliente(cid) {
-    var c = cotizacion(cid);
+  /* ---------------- Vista del cliente (estado primero) ---------------- */
+  function renderClienteVehiculo(vid) {
     app.className = "app";
+    var v = vid ? vehiculo(vid) : null;
 
-    if (!c) {
+    if (!v) {
       app.innerHTML =
         '<div class="cliente">' +
           cabeceraCliente() +
           '<main class="contenido">' +
-            '<div class="c-card vacio">Este enlace ya no es válido o la cotización no existe.</div>' +
+            '<div class="c-card vacio">Este enlace ya no es válido o el vehículo no existe.</div>' +
             volverConsola() +
           '</main>' +
         '</div>';
@@ -609,46 +859,109 @@
       return;
     }
 
-    var v = vehiculo(c.vehiculoId);
-    var cuerpo;
+    var hero = heroDe(v);
+    var cots = cotizacionesDe(v.id);
+    var pendientes = cots.filter(function (c) { return c.estado === "pendiente"; });
+    var decididas = cots.filter(function (c) { return c.estado !== "pendiente"; });
 
-    if (c.estado === "pendiente") {
-      var foto = c.foto ? '<img class="c-foto" src="' + esc(c.foto) + '" alt="Foto de la cotización">' : "";
-      cuerpo =
-        '<div class="c-card">' +
-          '<div class="c-cotiz-label">Cotización para autorizar</div>' +
-          '<p class="c-desc">' + esc(c.descripcion) + '</p>' +
-          '<div class="c-monto">' + money(c.monto) + '</div>' +
-          '<div class="c-monto-nota">Precio total del trabajo, IVA incluido.</div>' +
-          foto +
-          '<div class="c-acciones">' +
-            '<button class="btn btn-aprobar" data-accion="decidir" data-cid="' + c.id + '" data-decision="aprobada">Aprobar este trabajo</button>' +
-            '<button class="btn btn-rechazar" data-accion="decidir" data-cid="' + c.id + '" data-decision="rechazada">Rechazar este trabajo</button>' +
-          '</div>' +
-          '<p class="aviso">Tu decisión queda registrada con fecha y hora. No necesitas instalar nada.</p>' +
-        '</div>';
-    } else {
-      var r = registroDe(c.id);
-      cuerpo = comprobanteCliente(c, r);
-    }
+    // Acciones arriba: cotización pendiente y/o confirmar recolección.
+    var acciones = pendientes.map(function (c) { return cotizPendienteCliente(c); }).join("");
+    if (v.estado === "Listo para entrega") acciones += bloqueRecoleccion(v);
+
+    // Comprobantes de decisiones previas (referencia).
+    var comprobantes = decididas.map(function (c) {
+      return '<div class="c-card">' +
+               '<div class="bloque-label">Cotización</div>' +
+               comprobanteCliente(c, registroDe(c.id)) +
+             '</div>';
+    }).join("");
 
     app.innerHTML =
       '<div class="cliente">' +
         cabeceraCliente() +
+        '<section class="estado-hero ' + hero.clase + '" aria-live="polite">' +
+          '<div class="hero-placa">' + esc(v.placa) + '</div>' +
+          '<h1 class="hero-titular">' + esc(hero.titular) + '</h1>' +
+          '<div class="hero-sub">' + esc(v.modelo) + ' · a nombre de ' + esc(v.cliente) + '</div>' +
+        '</section>' +
         '<main class="contenido">' +
+          acciones +
           '<div class="c-card">' +
-            '<span class="c-placa">' + esc(v.placa) + '</span>' +
-            '<div class="c-modelo">' + esc(v.modelo) + '</div>' +
-            '<div class="c-duenio">A nombre de ' + esc(v.cliente) + '</div>' +
-            '<span class="' + chipVeh(v.estado, true) + '">' + esc(v.estado) + '</span>' +
+            '<div class="bloque-label">Avances de tu coche</div>' +
+            lineaTiempo(v) +
           '</div>' +
-          '<p class="c-saludo">Hola ' + esc(v.cliente.split(" ")[0]) + ', este es el estado de tu coche.</p>' +
-          cuerpo +
+          comprobantes +
           volverConsola() +
         '</main>' +
       '</div>';
 
     bind();
+  }
+
+  function lineaTiempo(v) {
+    var avisos = (v.avisos || []).slice().sort(function (a, b) {
+      return new Date(a.timestamp) - new Date(b.timestamp);
+    });
+    if (!avisos.length) return '<p class="c-saludo" style="margin:0">Aún no hay avisos registrados.</p>';
+    var ultimo = avisos.length - 1;
+    var items = avisos.map(function (a, i) {
+      var activa = i === ultimo;
+      var esListo = a.etapa === "Listo para entrega";
+      return '<li class="' + (activa ? "activa" : "") + (esListo ? " es-listo" : "") + '">' +
+               '<span class="punto" aria-hidden="true"></span>' +
+               '<div class="t-etapa">' + esc(a.etapa) + '</div>' +
+               '<div class="t-fecha">' + esc(fecha(a.timestamp)) + '</div>' +
+             '</li>';
+    }).join("");
+    return '<ol class="timeline">' + items + '</ol>';
+  }
+
+  function cotizPendienteCliente(c) {
+    var foto = c.foto ? '<img class="c-foto" src="' + esc(c.foto) + '" alt="Foto de la cotización">' : "";
+    return (
+      '<div class="c-card">' +
+        '<div class="c-cotiz-label">Cotización para autorizar</div>' +
+        '<p class="c-desc">' + esc(c.descripcion) + '</p>' +
+        '<div class="c-monto">' + money(c.monto) + '</div>' +
+        '<div class="c-monto-nota">Precio total del trabajo, IVA incluido.</div>' +
+        foto +
+        '<div class="c-acciones">' +
+          '<button class="btn btn-aprobar" data-accion="decidir" data-cid="' + c.id + '" data-decision="aprobada">Aprobar este trabajo</button>' +
+          '<button class="btn btn-rechazar" data-accion="decidir" data-cid="' + c.id + '" data-decision="rechazada">Rechazar este trabajo</button>' +
+        '</div>' +
+        '<p class="aviso">Tu decisión queda registrada con fecha y hora. No necesitas instalar nada.</p>' +
+      '</div>'
+    );
+  }
+
+  function bloqueRecoleccion(v) {
+    if (v.recoleccion) {
+      return (
+        '<div class="reco-ok">' +
+          '<span class="estampa">✓ Recolección confirmada</span>' +
+          '<dl>' +
+            '<dt>Horario</dt><dd>' + esc(v.recoleccion.horario) + '</dd>' +
+            '<dt>Confirmada</dt><dd>' + esc(fecha(v.recoleccion.timestamp)) + '</dd>' +
+          '</dl>' +
+        '</div>'
+      );
+    }
+    var ops = HORARIOS.map(function (h) {
+      var sel = ui.horarioSel === h;
+      return '<button class="horario-op' + (sel ? " sel" : "") + '" data-accion="sel-horario" data-h="' + esc(h) + '" aria-pressed="' + sel + '">' +
+               esc(h) + (sel ? '<span class="check">✓</span>' : "") + '</button>';
+    }).join("");
+    var listo = !!ui.horarioSel;
+    return (
+      '<div class="recoleccion">' +
+        '<h2>Confirmar recolección</h2>' +
+        '<p>¿Cuándo pasas por tu ' + esc(v.corto) + '? Elige un horario.</p>' +
+        '<div class="horarios">' + ops + '</div>' +
+        '<button class="btn btn-aprobar" data-accion="confirmar-recoleccion" data-vid="' + v.id + '"' +
+          (listo ? "" : " disabled") + '>' +
+          (listo ? "Confirmar: " + esc(ui.horarioSel) : "Elige un horario") + '</button>' +
+      '</div>'
+    );
   }
 
   function cabeceraCliente() {
@@ -745,6 +1058,31 @@
   }
 
   /* ---------------- Acciones ---------------- */
+
+  /* Aplica una etapa y registra su aviso (sin guardar ni re-renderizar). */
+  function aplicarEtapa(v, etapa) {
+    v.estado = etapa;
+    if (!v.avisos) v.avisos = [];
+    v.avisos.push({ etapa: etapa, timestamp: new Date().toISOString() });
+  }
+
+  function cambiarEtapa(vid, etapa) {
+    var v = vehiculo(vid);
+    if (!v || v.estado === etapa) return;
+    aplicarEtapa(v, etapa);
+    guardar();
+    render();
+  }
+
+  function confirmarRecoleccion(vid) {
+    var v = vehiculo(vid);
+    if (!v || v.recoleccion || !ui.horarioSel) return;
+    v.recoleccion = { horario: ui.horarioSel, timestamp: new Date().toISOString() };
+    ui.horarioSel = null;
+    guardar();
+    render();
+  }
+
   function decidir(cid, decision) {
     ui.confirm = { cid: cid, decision: decision };
     renderConfirmacion();
@@ -769,7 +1107,8 @@
     state.registros.push(registro);
     c.estado = decision;
     if (decision === "aprobada") {
-      v.estado = "En reparación";
+      // El cambio de etapa genera automáticamente su aviso en la línea de tiempo.
+      aplicarEtapa(v, "En reparación");
     }
     guardar();
     cerrarConfirm();
@@ -820,6 +1159,7 @@
 
       el.addEventListener("click", function () {
         var cid = el.getAttribute("data-cid");
+        var vid = el.getAttribute("data-vid");
         switch (accion) {
           case "toggle-enlace":
             ui.enlaceAbierto = (ui.enlaceAbierto === cid) ? null : cid;
@@ -827,6 +1167,19 @@
             break;
           case "abrir-cliente":
             location.hash = "#/c/" + cid;
+            break;
+          case "abrir-vehiculo":
+            location.hash = "#/v/" + vid;
+            break;
+          case "cambiar-etapa":
+            cambiarEtapa(vid, el.getAttribute("data-etapa"));
+            break;
+          case "sel-horario":
+            ui.horarioSel = el.getAttribute("data-h");
+            render();
+            break;
+          case "confirmar-recoleccion":
+            confirmarRecoleccion(vid);
             break;
           case "decidir":
             decidir(cid, el.getAttribute("data-decision"));
@@ -842,7 +1195,7 @@
     });
   }
 
-  window.addEventListener("hashchange", function () { cerrarConfirm(); render(); });
+  window.addEventListener("hashchange", function () { cerrarConfirm(); ui.horarioSel = null; render(); });
   render();
 })();
 </script>
